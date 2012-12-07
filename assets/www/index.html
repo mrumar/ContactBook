@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+  <head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>Schibsted contact book</title>
+	<link rel="stylesheet" href="css/main.css" />
+    <link rel="stylesheet" href="css/ui.css" />
+  </head>
+  <body>
+  	
+  	<div data-role="page" data-transition="pop" id="main">
+  		<header>
+  			<div class="logo">
+			   <img src ="img/schibsted-logo.png" alt=""/>
+			</div>
+		    <h1 class="main-header">Contact Book</h1>
+		    <a id="updateData" class="update-btn" data-role="button" data-theme="b" href="#">Update data</a>
+  		</header>
+			<div id="PeopleList" class="contact-list">
+			</div>			
+	</div>
+	
+	<div data-role="page" data-transition="fade" id="single-contact">
+				<h1 class="contact-header">Name and surname</h1>
+				<h2 class="contact-team">Team</h2>
+				
+				<div class="back-button">
+				<div class="ui-block-a" >  <a href="#main" data-role="button" data-theme="b"><img src="img/back_icon.png" alt="" /></a></div>
+				</div>
+				
+			    <div class="contact-photo"><img src="img/portrait.png" alt="" /></div>
+			     <div class="ui-grid-b">
+			                    <div class="ui-block-a" >  <a href="tel:+48721912022" class="contact-phone" data-role="button" data-theme="b"><img src="img/call_icon.png" alt="" /></a></div>
+			                    <div class="ui-block-b">  <a href="sms:+48721812022" class="contact-sms" data-role="button" data-theme="b"><img src="img/sms_icon.png" alt="" /></a></div>
+			                    <div class="ui-block-c" >  <a href="mailto:lmilik@mediaframe.pl" class="contact-email" data-role="button" data-theme="b"><img src="img/email_icon.png" alt="" /></a></div>     
+			 </div>
+			 
+		    <div data-role="controlgroup" style="text-align:center">
+		              <a href="#" class="add-to-contacts" data-role="button" data-theme="b">Add to contacts</a>
+		    </div>
+	</div>
+	<div data-role="page" id="dialog">
+		<div data-role="header" data-theme="c" >
+			<h1 class="dialog-title"></h1>
+		</div>
+		<section data-role="content" data-theme="c">
+			<p class="dialog-text"></p>
+			<a data-rel="back" data-role="button" data-theme="b" href="#">OK</a>
+		</section>
+	</div>
+	
+<script src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
+<script src="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.js"></script>
+    <script type="text/javascript" charset="utf-8" src="cordova-2.2.0.js"></script>
+	<script type="text/javascript" charset="utf-8" src="js/index.js"></script>
+  </body>
+</html>
