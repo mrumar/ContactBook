@@ -49,7 +49,7 @@ ContactBook = function() {
         xhr.open('GET', jsonURL);
         xhr.overrideMimeType("text/plain");
         xhr.onreadystatechange = function () {
-        	console.log("hurrra - zaladowano jsona: status: "+xhr.status+", readystate: "+xhr.readyState+", response txt: "+xhr.responseText);
+        	console.log("hurrra - zaladowano jsona");
 	        if (xhr.status == 200 && xhr.readyState == 4) {
 	            people = jQuery.parseJSON(xhr.responseText);
 	            people = people.file || people;
@@ -154,9 +154,34 @@ ContactBook = function() {
     	contactUIelems.team.text(currentPerson.team);
     }
     
+    this.contactExists = function(person) {
+    	 var options = new ContactFindOptions(),
+    	 fields = ["phoneNumbers", "displayName"];
+    	 
+         //options.filter = person.phone;
+    	 options.filter = "%"+person.phone;
+         navigator.contacts.find(fields, self.onFindContactSuccess, self.onFindContactError, options);
+    }
+    this.onFindContactSuccess = function(contacts) {
+    	console.log("znalazlem wynikow: "+contacts.length);
+    	console.log("telefon z bazy: "+currentPerson.phone);
+        for (var i=0; i<contacts.length; i++) {
+            console.log("znalazlem = " + contacts[i].phoneNumbers+", displayName: "+contacts[i].displayName);
+        }
+    }
+    this.onFindContactError = function(contactError) {
+        console.debug('onError!');
+    }
+    
     this.addToContacts = function(){
     	if(!currentPerson || !navigator.contacts) {
     		self.onSaveError();
+    		return false;
+    	}
+    	
+    	if (self.contactExists(currentPerson)) {
+    		// update contact?
+    		console.log("kontakt juz jest w ksiazce adresowej.");
     		return false;
     	}
     	var contactOrganizations = [],
@@ -180,7 +205,7 @@ ContactBook = function() {
     	contact.emails.push(new ContactField('work', currentPerson.email, false));
         
         // save
-        contact.save(self.onSaveSuccess, self.onSaveError);
+        //contact.save(self.onSaveSuccess, self.onSaveError);
 
     }
     this.onSaveSuccess = function(){
