@@ -34,8 +34,15 @@ ContactBook = function() {
     		// load from local DB
     		self.loadDataFromDB();
     	} else {
-    		// load from file
-    		self.loadDataFromJson();
+    		if (self.isConnected()) {
+    			// load from file
+        		self.loadDataFromJson();
+    		} else {
+    			// impossible to fetch data
+    			self.displayMessage('Error', 'Please connect to some network in order to fetch contact data.');
+    			
+    		}
+    		
     	}   
     	
     	if (firstRun) {
@@ -118,6 +125,9 @@ ContactBook = function() {
     this.isOnWifi = function(){
         return (navigator.network.connection.type === Connection.WIFI);
     }
+    this.isConnected = function(){
+        return (navigator.network.connection.type === Connection.CELL_2G || navigator.network.connection.type === Connection.CELL_3G || navigator.network.connection.type === Connection.CELL_4G || navigator.network.connection.type === Connection.WIFI || navigator.network.connection.type === Connection.ETHERNET);
+    }
     this.updateContacts = function() {
     	self.loadDataFromJson();
     }
@@ -154,23 +164,26 @@ ContactBook = function() {
     	contactUIelems.team.text(currentPerson.team);
     }
     
-    this.contactExists = function(person) {
+    this.searchForContact = function(person) {
     	 var options = new ContactFindOptions(),
     	 fields = ["phoneNumbers", "displayName"];
     	 
-         //options.filter = person.phone;
     	 options.filter = "%"+person.phone;
          navigator.contacts.find(fields, self.onFindContactSuccess, self.onFindContactError, options);
     }
     this.onFindContactSuccess = function(contacts) {
-    	console.log("znalazlem wynikow: "+contacts.length);
-    	console.log("telefon z bazy: "+currentPerson.phone);
+    	if (contacts.length === 0) {
+    		self.updateContact(null);
+    		return false;
+    	}
+    	// found 1 or more contacts with the same phone number
         for (var i=0; i<contacts.length; i++) {
-            console.log("znalazlem = " + contacts[i].phoneNumbers+", displayName: "+contacts[i].displayName);
+            console.log("znalazlem "+contacts.length+" wynikow = " + contacts[i].phoneNumbers+", displayName: "+contacts[i].displayName+", id: "+contacts[i].id);
+            self.updateContact(contacts[i]);
         }
     }
     this.onFindContactError = function(contactError) {
-        console.debug('onError!');
+        console.debug('Cannot search for contact!');
     }
     
     this.addToContacts = function(){
@@ -179,24 +192,30 @@ ContactBook = function() {
     		return false;
     	}
     	
-    	if (self.contactExists(currentPerson)) {
-    		// update contact?
-    		console.log("kontakt juz jest w ksiazce adresowej.");
-    		return false;
-    	}
+    	self.searchForContact(currentPerson);
+    }
+    this.updateContact = function(foundContact){
+
     	var contactOrganizations = [],
     		contact, 
     		contactName;
 
     	contact = navigator.contacts.create();
+    	
+    	if (foundContact !== null) {
+    		contact.id = foundContact.id;
+    		contact.rawId = foundContact.id;
+    	} else {
+    		contact.phoneNumbers = [];
+            contact.phoneNumbers.push(new ContactField('mobile', currentPerson.phone, true));
+    	}
+    	
         contact.displayName = currentPerson.firstname+' '+currentPerson.lastname;
         contact.nickname = currentPerson.firstname+' '+currentPerson.lastname;
         contactName = new ContactName();
         	contactName.givenName = currentPerson.firstname;
         	contactName.familyName = currentPerson.lastname;
         contact.name = contactName;
-        contact.phoneNumbers = [];
-        contact.phoneNumbers.push(new ContactField('mobile', currentPerson.phone, true));
         contactOrganizations.push(new ContactOrganization()); 
         contactOrganizations[0].name ="Schibsted Tech Polska";
         contact.organizations = contactOrganizations;
@@ -205,19 +224,20 @@ ContactBook = function() {
     	contact.emails.push(new ContactField('work', currentPerson.email, false));
         
         // save
-        //contact.save(self.onSaveSuccess, self.onSaveError);
+        contact.save(self.onSaveSuccess, self.onSaveError);
 
     }
+  
     this.onSaveSuccess = function(){
-    	dialogTitle.text('Success!');
-    	dialogText.text('Contact was saved.');
-    	$.mobile.changePage('#dialog', 'pop', true, true);
+    	self.displayMessage('Success!', 'Contact was saved.');
     }
     this.onSaveError = function(){
-    	dialogTitle.text('Error');
-    	dialogText.text('Something went wrong. Please try again.');
-    	//$.mobile.changePage('#dialog', 'pop', true, true);
-    	 $.mobile.changePage('#dialog', {transition: 'pop', role: 'dialog'});   
+    	self.displayMessage('Error', 'Something went wrong. Please try again.');
+    }
+    this.displayMessage = function(title, msg) {
+    	dialogTitle.text(title);
+    	dialogText.text(msg);
+    	$.mobile.changePage('#dialog', 'pop', true, true);
     }
 }
 
