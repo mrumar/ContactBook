@@ -10,7 +10,8 @@ ContactBook = function() {
     		phone: $('.contact-phone'),
     		sms: $('.contact-sms'),
     		email: $('.contact-email'),
-    		team: $('.contact-team')
+    		team: $('.contact-team'),
+    		phoneTxt: $('.contact-number')
     	},
     	dialogTitle = $('.dialog-title'),
     	dialogText = $('.dialog-text');
@@ -24,25 +25,28 @@ ContactBook = function() {
 
     this.loadData = function() {
     	var wifi = self.isOnWifi(),
+    		connected = self.isConnected(),
     		firstRun = !window.localStorage.getItem("SchibstedContactBook");
     	
     	// opens DB or creates one if it didn't exist
     	db = window.openDatabase("SchibstedContactBook", "1.0", "Schibsted Contact Book DB", 200000); 
     	// set flague when app is run for the first time
     	
+    	if(firstRun && !connected) {
+    		// impossible to fetch data
+			console.log("not connected, first run");
+			self.displayMessage('Error', 'Please connect to some network in order to fetch contact data.');
+			return false;
+    	}
+    	
     	if (!wifi && !firstRun) {
     		// load from local DB
+    		console.log("not wifi, not first run");
     		self.loadDataFromDB();
     	} else {
-    		if (self.isConnected()) {
-    			// load from file
-        		self.loadDataFromJson();
-    		} else {
-    			// impossible to fetch data
-    			self.displayMessage('Error', 'Please connect to some network in order to fetch contact data.');
-    			
-    		}
-    		
+			// load from file
+			console.log("connected");
+    		self.loadDataFromJson();
     	}   
     	
     	if (firstRun) {
@@ -159,6 +163,7 @@ ContactBook = function() {
     	
     	contactUIelems.name.text(currentPerson.firstname+' '+currentPerson.lastname);
     	contactUIelems.phone.attr('href', 'tel:'+currentPerson.phone);
+    	contactUIelems.phoneTxt.text(currentPerson.phone);
     	contactUIelems.sms.attr('href', 'sms:'+currentPerson.phone);
     	contactUIelems.email.attr('href', 'mailto:'+currentPerson.email);
     	contactUIelems.team.text(currentPerson.team);
@@ -244,7 +249,7 @@ ContactBook = function() {
 function onDeviceReady() { 
 	var contactBook = contactBook || new ContactBook();
 	$.mobile.listview.prototype.options.filterPlaceholder = "Search Schibsted contact...";
-	
+	console.log("device ready");
     contactBook.init();
 }
 
