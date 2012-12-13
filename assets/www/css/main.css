@@ -197,9 +197,7 @@ h1 {
 	clear:both;	
 }
 .dialog-wrapper {
-	overflow:hidden;
 	margin-top:30%;
+	background:none;
 }
-.ui-overlay-b{
-	background:red;
-}
+

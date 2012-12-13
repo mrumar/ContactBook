@@ -240,11 +240,20 @@ ContactBook = function() {
     	self.displayMessage('Error', 'Something went wrong. Please try again.');
     }
     this.displayMessage = function(title, msg) {
-    	dialogTitle.text(title);
-    	dialogText.text(msg);
-    	$.mobile.changePage('#dialog', 'pop', true, true);
+    	//dialogTitle.text(title);
+    	//dialogText.text(msg); 
+    	
+		$(document).simpledialog2({
+     mode: 'blank',
+    headerText: title,
+	themeHeader: 'b',
+    blankContent :"<h2 data-role='none' >"+msg+"</h2><a rel='close' data-role='button' href='#'>Close</a>"
+  });
     }
+	console.log("koniec funkcji")
 }
+
+
 
 function onDeviceReady() { 
 	var contactBook = contactBook || new ContactBook();
@@ -256,7 +265,12 @@ function onDeviceReady() {
 document.addEventListener("deviceready", onDeviceReady, false);
 
 
-
+    /*  $.mobile.changePage('#dialog', {
+        transition: "pop",
+        changeHash: false,
+        role: "popup"
+        });
+        */
 
 
 
