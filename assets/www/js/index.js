@@ -14,44 +14,44 @@ ContactBook = function() {
     		phoneTxt: $('.contact-number')
     	},
     	dialogTitle = $('.dialog-title'),
-    	dialogText = $('.dialog-text');
+    	dialogText = $('.dialog-text'),
+    	saveAll = {
+    		flague: false,
+    		success: 0,
+    		fail: 0,
+    		sum: 0
+    	}
     
     this.init = function() {  
         self.loadData();
         
         $('.add-to-contacts').on('click', self.addToContacts);
         $('#updateData').on('click', self.updateContacts);
+        $('#saveAll').on('click', self.saveAllContacts);
     }
 
     this.loadData = function() {
     	var wifi = self.isOnWifi(),
     		connected = self.isConnected(),
-    		firstRun = !window.localStorage.getItem("SchibstedContactBook");
+    		firstRun = !window.localStorage.getItem("SchibstedContactBook"),
+    		dbInit = !!window.localStorage.getItem("SchibstedContactBookDBinit");
     	
     	// opens DB or creates one if it didn't exist
     	db = window.openDatabase("SchibstedContactBook", "1.0", "Schibsted Contact Book DB", 200000); 
-    	// set flague when app is run for the first time
     	
-    	if(firstRun && !connected) {
-    		// impossible to fetch data
-			console.log("not connected, first run");
-			self.displayMessage('Error', 'Please connect to some network in order to fetch contact data.');
-			return false;
+    	// set flague when app is run for the first time
+    	if (firstRun) {
+    		window.localStorage.setItem("SchibstedContactBook", "true");
+    		self.loadDataFromJson();
+    		return false;
     	}
     	
-    	if (!wifi && !firstRun) {
-    		// load from local DB
-    		console.log("not wifi, not first run");
+    	if (!wifi && dbInit) {
     		self.loadDataFromDB();
     	} else {
-			// load from file
-			console.log("connected");
     		self.loadDataFromJson();
     	}   
     	
-    	if (firstRun) {
-    		window.localStorage.setItem("SchibstedContactBook", "true");
-    	}
     }
     
     this.loadDataFromJson = function() {
@@ -60,7 +60,12 @@ ContactBook = function() {
         xhr.open('GET', jsonURL);
         xhr.overrideMimeType("text/plain");
         xhr.onreadystatechange = function () {
-        	console.log("hurrra - zaladowano jsona");
+        	if (xhr.status != 200) {
+        		// failed to fetch data from server
+        		self.displayMessage('Error', 'Cannot update data from server.');
+	        	console.log('xhr.status: '+xhr.status+', xhr.readyState: '+xhr.readyState)
+        		return false;
+        	}
 	        if (xhr.status == 200 && xhr.readyState == 4) {
 	            people = jQuery.parseJSON(xhr.responseText);
 	            people = people.file || people;
@@ -125,6 +130,10 @@ ContactBook = function() {
 	}
 	this.dbSaveSuccess = function() {
 		console.info('success: data saved in databse!');
+		if (!window.localStorage.getItem("SchibstedContactBookDBinit")) {
+			window.localStorage.setItem("SchibstedContactBookDBinit", "true");
+			console.log("pierwszy raz wypelnilem baze");
+		}
 	}
     this.isOnWifi = function(){
         return (navigator.network.connection.type === Connection.WIFI);
@@ -136,7 +145,6 @@ ContactBook = function() {
     	self.loadDataFromJson();
     }
     this.createPeopleList = function() {
-    	console.log("buduje liste kontaktow;");
     	var ul = $('<ul data-role="listview"  data-filter-theme="b" data-filter="true" ></ul>'),
     		li,
     		i = 0,
@@ -174,32 +182,36 @@ ContactBook = function() {
     	 fields = ["phoneNumbers", "displayName"];
     	 
     	 options.filter = "%"+person.phone;
-         navigator.contacts.find(fields, self.onFindContactSuccess, self.onFindContactError, options);
+         navigator.contacts.find(fields, function(contacts) { self.onFindContactSuccess(contacts, person) }, self.onFindContactError, options);
     }
-    this.onFindContactSuccess = function(contacts) {
+    this.onFindContactSuccess = function(contacts, person) {
     	if (contacts.length === 0) {
-    		self.updateContact(null);
+    		self.updateContact(null, person);
     		return false;
     	}
     	// found 1 or more contacts with the same phone number
         for (var i=0; i<contacts.length; i++) {
             console.log("znalazlem "+contacts.length+" wynikow = " + contacts[i].phoneNumbers+", displayName: "+contacts[i].displayName+", id: "+contacts[i].id);
-            self.updateContact(contacts[i]);
+            self.updateContact(contacts[i], person);
         }
     }
     this.onFindContactError = function(contactError) {
         console.debug('Cannot search for contact!');
     }
     
-    this.addToContacts = function(){
-    	if(!currentPerson || !navigator.contacts) {
+    this.addToContacts = function(p){
+    	var person = (!p) ? currentPerson : p;
+    	
+    	if(!person || !navigator.contacts) {
     		self.onSaveError();
     		return false;
     	}
     	
-    	self.searchForContact(currentPerson);
+    	self.searchForContact(person);
     }
-    this.updateContact = function(foundContact){
+
+    // overrides foundContact(s) with data from person object
+    this.updateContact = function(foundContact, person){
 
     	var contactOrganizations = [],
     		contact, 
@@ -212,21 +224,20 @@ ContactBook = function() {
     		contact.rawId = foundContact.id;
     	} else {
     		contact.phoneNumbers = [];
-            contact.phoneNumbers.push(new ContactField('mobile', currentPerson.phone, true));
+            contact.phoneNumbers.push(new ContactField('mobile', person.phone, true));
     	}
     	
-        contact.displayName = currentPerson.firstname+' '+currentPerson.lastname;
-        contact.nickname = currentPerson.firstname+' '+currentPerson.lastname;
+        contact.displayName = person.firstname+' '+person.lastname;
         contactName = new ContactName();
-        	contactName.givenName = currentPerson.firstname;
-        	contactName.familyName = currentPerson.lastname;
+        	contactName.givenName = person.firstname;
+        	contactName.familyName = person.lastname;
         contact.name = contactName;
         contactOrganizations.push(new ContactOrganization()); 
         contactOrganizations[0].name ="Schibsted Tech Polska";
         contact.organizations = contactOrganizations;
-    	contact.note = currentPerson.team;
+    	contact.note = person.team;
     	contact.emails = [];
-    	contact.emails.push(new ContactField('work', currentPerson.email, false));
+    	contact.emails.push(new ContactField('work', person.email, false));
         
         // save
         contact.save(self.onSaveSuccess, self.onSaveError);
@@ -234,10 +245,23 @@ ContactBook = function() {
     }
   
     this.onSaveSuccess = function(){
-    	self.displayMessage('Success!', 'Contact was saved.');
+    	console.log('saveAll.flaga: '+saveAll.flague);
+    	if (!saveAll.flague) {
+    		self.displayMessage('Success!', 'Contact was saved.');
+    	} else {
+    		saveAll.success++;
+    		saveAll.sum++;
+    		self.onSaveAllResult();
+    	}
     }
     this.onSaveError = function(){
-    	self.displayMessage('Error', 'Something went wrong. Please try again.');
+    	if(!saveAll.flague) {
+    		self.displayMessage('Error', 'Something went wrong. Please try again.');
+    	} else {
+    		saveAll.fail++;
+    		saveAll.sum++;
+    		self.onSaveAllResult();
+    	}
     }
     this.displayMessage = function(title, msg) {
     	//dialogTitle.text(title);
@@ -250,6 +274,28 @@ ContactBook = function() {
 	themeHeader: 'b',
     blankContent :"<h2 data-role='none' >"+msg+"</h2><a rel='close' data-role='button' href='#'>Close</a>"
   });
+    }
+    this.saveAllContacts = function() {
+    	var i = 0,
+    		len = people.length;
+    	
+    	saveAll.flague = true;
+    	for (i; i < len; ++i){
+    		self.addToContacts(people[i]);
+    	}
+    }
+    this.onSaveAllResult = function() {
+    	console.log('saveAll.sum: '+saveAll.sum+' , people.len: '+people.length);
+    	if(saveAll.sum !== people.length) {
+    		return;
+    	}
+    	// all contacts iterated:
+    	console.log('suma kontaktow: '+saveAll.sum)
+    	self.displayMessage('Result', saveAll.success+' contacts saved, '+saveAll.fail+' contacts failed.');
+    	saveAll.flague = false;
+    	saveAll.sum = 0;
+    	saveAll.success = 0;
+    	saveAll.fail = 0;
     }
 }
 
