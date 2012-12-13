@@ -98,7 +98,7 @@
 
 .ui-btn-up-b {
     border: 1px solid       #044062 /*{b-bup-border}*/;
-    background:             #396b9e /*{b-bup-background-color}*/;
+    background:             #4d90bc /*{b-bup-background-color}*/;
     font-weight: bold;
     color:                  #fff /*{b-bup-color}*/;
   
@@ -345,7 +345,28 @@ div.ui-mobile-viewport { overflow-x: hidden; }
 }
 /* loading screen */
 .ui-loading .ui-loader { display: block; }
-.ui-loader { display:none; width:100%; height:100%;z-index: 9999999; position: fixed; background: rgba(0,0,0,0.5)}
+.ui-loader { position:fixed; display:none; width:100%; height:100%;z-index: 9999999;  background: rgba(0,0,0,0.5); border-radius:0px; padding-left:3em;}
+.ui-loader h1 {
+text-align: right;
+padding-right: 1em;
+width: 7em;
+height: 2em;
+background-color: white;
+padding-top: 0.8em;
+z-index: 9999999;
+top: 50%;
+right: 50%;
+border: 0;
+background-size: 32px 32px;
+background-image: url('../img/loading.gif');
+background-repeat: no-repeat;
+background-position: 0.5em 0.6em;
+border-radius: 0.6em;
+font-size: 1.9em;
+position: absolute;
+margin-right: -3.5em;
+}
+
 /*fouc*/
 .ui-mobile-rendering > * { visibility: hidden; }
 /*headers, content panels*/
@@ -956,31 +977,12 @@ ol.ui-listview .ui-li-jsnumbering:before { content: "" !important; } /* to avoid
     border-top-right-radius:           1em /*{global-radii-blocks}*/;
 }
 .ui-simpledialog-container  .ui-btn-inner{
-	padding:0;
+	padding:2px 0px;
 }
 
-.ui-loader h1 {
-	text-align: right;
-padding-right: 1em;
-text-align: right;
-padding-right: 1em;
-width: 7em;
-height: 2em;
-background-color: white;
-padding-top: 0.8em;
-z-index: 9999999;
-position: fixed;
-top: 50%;
-left: 50%;
-border: 0;
-background-size: 8px 8px;
-background-image: url('../img/loading.gif');
-background-repeat: no-repeat;
-background-position: 0.5em 0.6em;
-border-radius: 0.6em;
-font-size: 1.9em;
+#PeopleList input{
+	text-align:left;
 }
-
 
 
 

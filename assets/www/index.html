@@ -9,19 +9,22 @@
   </head>
   <body>
   	
-  	<div data-role="page" data-transition="pop" id="main">
-  		<header>
+  	<div data-role="page" data-transition="fade" id="main">
+  		<div class="ui-grid-b">
+  		<header >
   			<div class="logo">
 			   <img src ="img/schibsted-logo.png" alt=""/>
 			</div>
 		    <h1 class="main-header">Contact Book</h1>
+			<div style="clear:both"></div>
 			
 		    <a id="updateData" class="update-btn" data-role="button" data-theme="b" href="#">Update data</a>
 			<a id="saveAll" class="update-btn" data-role="button" data-theme="b" href="#">Add all to contacts</a>
 	
   		</header>
 			<div id="PeopleList" class="contact-list">
-			</div>			
+			</div>		
+			</div>	
 	</div>
 	
 	<div data-role="page" data-transition="fade" id="single-contact">

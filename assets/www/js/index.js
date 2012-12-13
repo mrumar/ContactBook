@@ -145,7 +145,7 @@ ContactBook = function() {
     	self.loadDataFromJson();
     }
     this.createPeopleList = function() {
-    	var ul = $('<ul data-role="listview"  data-filter-theme="b" data-filter="true" ></ul>'),
+    	var ul = $('<ul data-role="listview"  data-theme="b" data-filter-theme="b" data-filter="true" ></ul>'),
     		li,
     		i = 0,
     		len = people.length;
@@ -272,7 +272,7 @@ ContactBook = function() {
     headerText: title,
 	animate: false,
 	themeHeader: 'b',
-    blankContent :"<h2 data-role='none' >"+msg+"</h2><a rel='close' data-role='button' href='#'>Close</a>"
+    blankContent :"<h2 data-role='none' style='padding:7px 0px;'>"+msg+"</h2><a rel='close' data-role='button' href='#'>Close</a>"
   });
     }
     this.saveAllContacts = function() {
@@ -306,6 +306,7 @@ function onDeviceReady() {
 	$.mobile.listview.prototype.options.filterPlaceholder = "Search Schibsted contact...";
 	console.log("device ready");
     contactBook.init();
+	
 }
 
 document.addEventListener("deviceready", onDeviceReady, false);
