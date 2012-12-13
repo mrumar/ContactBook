@@ -186,7 +186,8 @@ ContactBook = function() {
     	 fields = ["phoneNumbers", "displayName"];
     	 
     	 // if phone number is empty or invalid, add contact without searching in db
-    	 if (!person.phone || person.phone.length < 9) {
+    	 console.log("phone: "+person.phone);
+    	 if (!person.phone) {
     		 self.updateContact(null, person);
     		 return false;
     	 }
