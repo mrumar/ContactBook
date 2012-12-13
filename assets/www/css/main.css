@@ -45,6 +45,9 @@ body {
 	font-size:62.5%;
 	height:100%
 }
+header{
+	margin-bottom:1rem;
+}
 .logo {
     float:left; position:absolute; padding:1rem; top:0; left:0; float:left
 }
@@ -163,8 +166,7 @@ h1 {
 		border: solid 2px #FFFFFF;
 		margin: 0 auto;
 		text-align:center;
-		margin-bottom: 3rem;
-        margin-top: 5rem;
+        margin-top: 2rem;
 		
 }
 .contact-photo img {
@@ -172,7 +174,13 @@ h1 {
 	max-width:100%;
 	max-height:100%;
 }
-
+.contact-number {
+	width:100%;
+	text-align:center;
+	font-size:2rem;
+	color:white;
+	 font-family: 'MyriadProLight';
+}
 .back-button{
 	margin-left: 0.3rem;
 }
@@ -187,4 +195,11 @@ h1 {
 }
 .update-btn {
 	clear:both;	
+}
+.dialog-wrapper {
+	overflow:hidden;
+	margin-top:30%;
+}
+.ui-overlay-b{
+	background:red;
 }

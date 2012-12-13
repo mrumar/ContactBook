@@ -5,6 +5,7 @@
 	<title>Schibsted contact book</title>
 	<link rel="stylesheet" href="css/main.css" />
     <link rel="stylesheet" href="css/ui.css" />
+
   </head>
   <body>
   	
@@ -14,7 +15,11 @@
 			   <img src ="img/schibsted-logo.png" alt=""/>
 			</div>
 		    <h1 class="main-header">Contact Book</h1>
+			
 		    <a id="updateData" class="update-btn" data-role="button" data-theme="b" href="#">Update data</a>
+			<a id="updateData" class="update-btn" data-role="button" data-theme="b" href="#">Add all to contacts</a>
+	
+			
   		</header>
 			<div id="PeopleList" class="contact-list">
 			</div>			
@@ -39,13 +44,14 @@
 		              <a href="#" class=" add-to-contacts" data-role="button" data-theme="b">Add to contacts</a>
 		    </div>
 	</div>
-	<div data-role="page" id="dialog"  data-theme="b">
+	
+	<div data-role="page" id="dialog" data-theme="b"  class="dialog-wrapper ui-btn-corner-all ui-corner-all"> 
 		<div data-role="header" data-theme="b" >
 			<h1 class="dialog-title"></h1>
 		</div>
-		<section data-role="content" data-theme="b"  >
+		<section data-role="content"  data-theme="b">
 			<p class="dialog-text"></p>
-			<a data-rel="back" data-role="button" data-theme="b" href="#">OK</a>
+			<a data-rel="back" data-role="button" href="#single-contact">OK</a>
 		</section>
 	</div>
 	
