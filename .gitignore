@@ -4,3 +4,10 @@
 .project.properties
 bin/
 gen/com/Schibsted/ContactBook/BuildConfig.java
+/**/bin/**/*
+/./**/bin/**/*
+./**/bin/**/*
+**/bin/**/*
+*/bin/**/*
+bin/**/*
+/**/bin/*

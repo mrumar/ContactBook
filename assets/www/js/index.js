@@ -246,11 +246,11 @@ ContactBook = function() {
 		$(document).simpledialog2({
      mode: 'blank',
     headerText: title,
+	animate: false,
 	themeHeader: 'b',
     blankContent :"<h2 data-role='none' >"+msg+"</h2><a rel='close' data-role='button' href='#'>Close</a>"
   });
     }
-	console.log("koniec funkcji")
 }
 
 
@@ -263,14 +263,6 @@ function onDeviceReady() {
 }
 
 document.addEventListener("deviceready", onDeviceReady, false);
-
-
-    /*  $.mobile.changePage('#dialog', {
-        transition: "pop",
-        changeHash: false,
-        role: "popup"
-        });
-        */
 
 
 
