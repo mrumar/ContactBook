@@ -2,5 +2,5 @@
 .project
 .local.properties
 .project.properties
-bin\
-gen\com\Schibsted\ContactBook\BuildConfig.java
+bin/
+gen/com/Schibsted/ContactBook/BuildConfig.java
