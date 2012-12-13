@@ -15,10 +15,12 @@ ContactBook = function() {
     	},
     	dialogTitle = $('.dialog-title'),
     	dialogText = $('.dialog-text'),
+    	loaderElm = $('.ui-loader'),
     	saveAll = {
     		flague: false,
     		success: 0,
     		fail: 0,
+    		failedPeople: [],
     		sum: 0
     	}
     
@@ -71,10 +73,12 @@ ContactBook = function() {
 	            people = people.file || people;
 	            self.saveDataInDB();
 	            self.createPeopleList();
+	            self.hideLoader();
+	    		self.displayMessage('Success!', 'Contacts updated.');
 	        }
         };
         xhr.send();
-
+        self.showLoader();
     }
     
     this.saveDataInDB = function() {
@@ -181,6 +185,12 @@ ContactBook = function() {
     	 var options = new ContactFindOptions(),
     	 fields = ["phoneNumbers", "displayName"];
     	 
+    	 // if phone number is empty or invalid, add contact without searching in db
+    	 if (person.phone.length < 9) {
+    		 self.updateContact(null, person);
+    		 return false;
+    	 }
+    	 
     	 options.filter = "%"+person.phone;
          navigator.contacts.find(fields, function(contacts) { self.onFindContactSuccess(contacts, person) }, self.onFindContactError, options);
     }
@@ -207,6 +217,7 @@ ContactBook = function() {
     		return false;
     	}
     	
+    	self.showLoader();
     	self.searchForContact(person);
     }
 
@@ -240,7 +251,7 @@ ContactBook = function() {
     	contact.emails.push(new ContactField('work', person.email, false));
         
         // save
-        contact.save(self.onSaveSuccess, self.onSaveError);
+        contact.save(self.onSaveSuccess, function(){ self.onSaveError(person) });
 
     }
   
@@ -248,54 +259,69 @@ ContactBook = function() {
     	console.log('saveAll.flaga: '+saveAll.flague);
     	if (!saveAll.flague) {
     		self.displayMessage('Success!', 'Contact was saved.');
+    		self.hideLoader();
     	} else {
     		saveAll.success++;
     		saveAll.sum++;
     		self.onSaveAllResult();
     	}
     }
-    this.onSaveError = function(){
+    this.onSaveError = function(person){
     	if(!saveAll.flague) {
+    		self.hideLoader();
     		self.displayMessage('Error', 'Something went wrong. Please try again.');
     	} else {
     		saveAll.fail++;
     		saveAll.sum++;
+    		saveAll.failedPeople.push(person);
     		self.onSaveAllResult();
     	}
     }
     this.displayMessage = function(title, msg) {
-    	//dialogTitle.text(title);
-    	//dialogText.text(msg); 
-    	
+
 		$(document).simpledialog2({
-     mode: 'blank',
-    headerText: title,
-	animate: false,
-	themeHeader: 'b',
-    blankContent :"<h2 data-role='none' >"+msg+"</h2><a rel='close' data-role='button' href='#'>Close</a>"
-  });
+		    mode: 'blank',
+		    headerText: title,
+			animate: false,
+			themeHeader: 'b',
+		    blankContent :"<h2 data-role='none' >"+msg+"</h2><a rel='close' data-role='button' href='#'>Close</a>"
+		});
     }
     this.saveAllContacts = function() {
     	var i = 0,
     		len = people.length;
     	
+    	self.showLoader();
     	saveAll.flague = true;
     	for (i; i < len; ++i){
     		self.addToContacts(people[i]);
     	}
     }
     this.onSaveAllResult = function() {
+    	var i = 0, str = '';
+    	
     	console.log('saveAll.sum: '+saveAll.sum+' , people.len: '+people.length);
     	if(saveAll.sum !== people.length) {
     		return;
     	}
     	// all contacts iterated:
+    	for(i = 0; i < saveAll.failedPeople.length; ++i) {
+    		str += saveAll.failedPeople[i].firstname + ' ' + saveAll.failedPeople[i].lastname + '<br>';
+    	}
+    	
+    	self.hideLoader();
     	console.log('suma kontaktow: '+saveAll.sum)
-    	self.displayMessage('Result', saveAll.success+' contacts saved, '+saveAll.fail+' contacts failed.');
+    	self.displayMessage('Result', saveAll.success+' contacts saved, '+saveAll.fail+' contacts failed:<br>'+str);
     	saveAll.flague = false;
     	saveAll.sum = 0;
     	saveAll.success = 0;
     	saveAll.fail = 0;
+    }
+    this.showLoader = function(){
+    	loaderElm.show();
+    }
+    this.hideLoader = function(){
+    	loaderElm.hide();
     }
 }
 
