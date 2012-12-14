@@ -67,6 +67,7 @@ ContactBook = function() {
         	
         	if (xhr.status != 200) {
                 // failed to fetch data from server
+        		self.hideLoader();
                 self.displayMessage('Error', 'Cannot update data from server.');
                 return false;
             }
@@ -262,8 +263,8 @@ ContactBook = function() {
         contact.emails.push(new ContactField('work', person.email, false));
 
         // save
-        contact.save(self.onSaveSuccess, function() {
-            self.onSaveError(person)
+        contact.save(self.onSaveSuccess, function(e) {
+            self.onSaveError(e, person);
         });
 
     }
@@ -279,9 +280,10 @@ ContactBook = function() {
             self.onSaveAllResult();
         }
     }
-    this.onSaveError = function(person) {
+    this.onSaveError = function(e, person) {
         if (!saveAll.flague) {
             self.hideLoader();
+            console.log("error code: "+e.code);
             self.displayMessage('Error', 'Something went wrong. Please try again.');
         } else {
             saveAll.fail++;
