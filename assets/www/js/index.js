@@ -240,7 +240,7 @@ ContactBook = function() {
             contact,
             contactName;
 
-        contact = navigator.contacts.create();
+        contact = navigator.contacts.create();   
 
         if (foundContact !== null) {
             contact.id = foundContact.id;
