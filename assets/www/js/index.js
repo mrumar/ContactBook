@@ -67,7 +67,7 @@ ContactBook = function() {
         	if (xhr.status != 200) {
                 // failed to fetch data from server
         		self.hideLoader();
-                self.displayMessage('Error', 'Cannot update data from server.');
+                self.displayMessage('Error', 'Cannot update data from server.<br>Please check your Internet connection.');
                 return false;
             }
             if (xhr.status == 200 && xhr.readyState == 4) {
