@@ -185,7 +185,7 @@ ContactBook = function() {
 
     this.searchForContact = function(person) {
         var options = new ContactFindOptions(),
-            fields = ["phoneNumbers", "displayName"];
+            fields = ["phoneNumbers", "displayName", "emails"];
 
         if (!person || !navigator.contacts) {
             self.onSaveError();
@@ -249,7 +249,13 @@ ContactBook = function() {
             contact.phoneNumbers = [];
             contact.phoneNumbers.push(new ContactField('mobile', person.phone, true));
         }
-
+        
+        // check duplicates in emails
+        if (!self.emailExists(foundContact.emails, person.email)) {
+        	contact.emails = [];
+            contact.emails.push(new ContactField('work', person.email, false));
+        }
+        
         contact.displayName = person.firstname + ' ' + person.lastname;
         contactName = new ContactName();
         contactName.givenName = person.firstname;
@@ -259,8 +265,7 @@ ContactBook = function() {
         contactOrganizations[0].name = "Schibsted Tech Polska";
         contact.organizations = contactOrganizations;
         contact.note = person.team;
-        contact.emails = [];
-        contact.emails.push(new ContactField('work', person.email, false));
+        
 
         // save
         contact.save(self.onSaveSuccess, function(e) {
@@ -268,6 +273,20 @@ ContactBook = function() {
         });
 
     }
+    this.emailExists = function(emailsArr, email) {
+    	var i = 0;
+    	if (!emailsArr) {
+    		return false;
+    	}
+    	
+    	for(i; i < emailsArr.length; i++) {
+        	console.log("email["+i+"]: "+emailsArr[i].value);
+        	if (emailsArr[i].value == email) {
+        		return true;
+        	}
+        }
+    	return false;
+    } 
 
     this.onSaveSuccess = function() {
         if (!saveAll.flague) {
