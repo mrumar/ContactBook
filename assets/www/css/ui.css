@@ -354,7 +354,7 @@ height: 2em;
 background-color: white;
 padding-top: 0.8em;
 z-index: 9999999;
-top: 50%;
+top: 6rem;
 right: 50%;
 border: 0;
 background-size: 32px 32px;
@@ -363,7 +363,7 @@ background-repeat: no-repeat;
 background-position: 0.5em 0.6em;
 border-radius: 0.6em;
 font-size: 1.9em;
-position: absolute;
+position: fixed;
 margin-right: -3.5em;
 }
 
@@ -956,10 +956,10 @@ ol.ui-listview .ui-li-jsnumbering:before { content: "" !important; } /* to avoid
 /* Shared Styles */
 
 .ui-simpledialog-header h4 { margin-top: 5px; margin-bottom: 5px; text-align: center; overflow:hidden; }
-.ui-simpledialog-screen { position: absolute; top: 0px; left: 0px; width: 100%; height: 100%; }
+.ui-simpledialog-screen { position: fixed; bottom:0px; right:0px; top: 0px; left: 0px; width: 100%; height: 100%; }
 .ui-simpledialog-hidden { display: none; }
 .ui-simpledialog-input { width: 85% !important; display: block !important; margin-left: auto; margin-right: auto;}
-.ui-simpledialog-screen-modal { background-color: black; -moz-opacity: 0.5; opacity:.50; filter: alpha(opacity=50); }
+.ui-simpledialog-screen-modal { background-color: black; -moz-opacity: 0.5; opacity:.50; filter: alpha(opacity=50); width:100%; min-height:100% }
 .ui-simpledialog-subtitle { text-align: center; }
 .ui-simpledialog-controls .buttons-separator {min-height: .6em;}
 .ui-simpledialog-controls .button-hidden { display:none; }
@@ -977,7 +977,7 @@ ol.ui-listview .ui-li-jsnumbering:before { content: "" !important; } /* to avoid
     border-top-right-radius:           1em /*{global-radii-blocks}*/;
 }
 .ui-simpledialog-container  .ui-btn-inner{
-	padding:2px 0px;
+	padding:6px 0px;
 }
 
 #PeopleList input{
