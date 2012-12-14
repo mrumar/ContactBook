@@ -63,10 +63,11 @@ ContactBook = function() {
         xhr.open('GET', jsonURL);
         xhr.overrideMimeType("text/plain");
         xhr.onreadystatechange = function() {
-            if (xhr.status != 200) {
+        	console.log('xhr.status: ' + xhr.status + ', xhr.readyState: ' + xhr.readyState)
+        	
+        	if (xhr.status != 200) {
                 // failed to fetch data from server
                 self.displayMessage('Error', 'Cannot update data from server.');
-                console.log('xhr.status: ' + xhr.status + ', xhr.readyState: ' + xhr.readyState)
                 return false;
             }
             if (xhr.status == 200 && xhr.readyState == 4) {
