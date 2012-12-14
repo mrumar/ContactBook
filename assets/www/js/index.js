@@ -1,4 +1,3 @@
-
 ContactBook = function() {
     var self = this,
         people = [],
@@ -63,7 +62,7 @@ ContactBook = function() {
         xhr.open('GET', jsonURL);
         xhr.overrideMimeType("text/plain");
         xhr.onreadystatechange = function() {
-        	console.log('xhr.status: ' + xhr.status + ', xhr.readyState: ' + xhr.readyState)
+        	//console.log('xhr.status: ' + xhr.status + ', xhr.readyState: ' + xhr.readyState)
         	
         	if (xhr.status != 200) {
                 // failed to fetch data from server
@@ -139,7 +138,7 @@ ContactBook = function() {
         console.info('success: data saved in databse!');
         if (!window.localStorage.getItem("SchibstedContactBookDBinit")) {
             window.localStorage.setItem("SchibstedContactBookDBinit", "true");
-            console.log("pierwszy raz wypelnilem baze");
+            //console.log("pierwszy raz wypelnilem baze");
         }
     }
     this.isOnWifi = function() {
@@ -200,6 +199,7 @@ ContactBook = function() {
             return false;
         }
 
+        // for iOS "%" doesn't work & need to be removed
         options.filter = "%" + person.phone;
         navigator.contacts.find(fields, function(contacts) {
             self.onFindContactSuccess(contacts, person)
@@ -212,7 +212,7 @@ ContactBook = function() {
         }
         // found 1 or more contacts with the same phone number
         for (var i = 0; i < contacts.length; i++) {
-            console.log("znalazlem " + contacts.length + " wynikow = " + contacts[i].phoneNumbers + ", displayName: " + contacts[i].displayName + ", id: " + contacts[i].id);
+            console.log("znalazlem " + contacts.length + " wynikow: displayName: " + contacts[i].displayName + ", id: " + contacts[i].id);
             self.updateContact(contacts[i], person);
         }
     }
@@ -270,7 +270,6 @@ ContactBook = function() {
     }
 
     this.onSaveSuccess = function() {
-        console.log('saveAll.flaga: ' + saveAll.flague);
         if (!saveAll.flague) {
             self.displayMessage('Success!', 'Contact was saved.');
             self.hideLoader();
@@ -326,7 +325,6 @@ ContactBook = function() {
         }
 
         self.hideLoader();
-        console.log('suma kontaktow: ' + saveAll.sum)
         self.displayMessage('Result', saveAll.success + ' contacts saved, ' + saveAll.fail + ' contacts failed:<br>' + str);
         saveAll.flague = false;
         saveAll.sum = 0;
