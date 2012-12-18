@@ -251,9 +251,11 @@ ContactBook = function() {
         }
         
         // check duplicates in emails
-        if (!self.emailExists(foundContact.emails, person.email)) {
+        if (foundContact === null || !self.emailExists(foundContact, person.email)) {
+        	console.log("adding email");
         	contact.emails = [];
             contact.emails.push(new ContactField('work', person.email, false));
+            console.log(contact.emails.length+", person email: "+person.email)
         }
         
         contact.displayName = person.firstname + ' ' + person.lastname;
@@ -273,8 +275,10 @@ ContactBook = function() {
         });
 
     }
-    this.emailExists = function(emailsArr, email) {
-    	var i = 0;
+    this.emailExists = function(contact, email) {
+    	var i = 0,
+    		emailsArr = !!contact ?  contact.emails : null;
+    	
     	if (!emailsArr) {
     		return false;
     	}
