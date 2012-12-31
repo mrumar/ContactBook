@@ -33,7 +33,7 @@ ContactBook = function() {
     }
 
     this.loadData = function() {
-        var wifi = self.isOnWifi(),
+        var localWifi = self.isOnLocalWifi(),
             connected = self.isConnected(),
             firstRun = !window.localStorage.getItem("SchibstedContactBook"),
             dbInit = !! window.localStorage.getItem("SchibstedContactBookDBinit");
@@ -47,26 +47,29 @@ ContactBook = function() {
             self.loadDataFromJson();
             return false;
         }
-
-        if (!wifi && dbInit) {
+        
+        console.log("is on corpo wifi: "+localWifi);
+        
+        if (!localWifi && dbInit) {
             self.loadDataFromDB();
         } else {
-            self.loadDataFromJson();
+            //self.loadDataFromJson();
+        	self.loadDataFromJson();
         }
 
     }
-
+    
     this.loadDataFromJson = function() {
         console.log("loading data from json");
         var xhr = new XMLHttpRequest();
         xhr.open('GET', jsonURL);
         xhr.overrideMimeType("text/plain");
         xhr.onreadystatechange = function() {
-        	//console.log('xhr.status: ' + xhr.status + ', xhr.readyState: ' + xhr.readyState)
-        	
-        	if (xhr.status != 200) {
+            //console.log('xhr.status: ' + xhr.status + ', xhr.readyState: ' + xhr.readyState)
+
+            if (xhr.status != 200) {
                 // failed to fetch data from server
-        		self.hideLoader();
+                self.hideLoader();
                 self.displayMessage('Error', 'Cannot update data from server.<br>Please check your Internet connection.');
                 return false;
             }
@@ -141,8 +144,11 @@ ContactBook = function() {
             //console.log("pierwszy raz wypelnilem baze");
         }
     }
-    this.isOnWifi = function() {
-        return (navigator.network.connection.type === Connection.WIFI);
+    this.isOnLocalWifi = function() {
+    	var wifi = (navigator.network.connection.type === Connection.WIFI),
+    		local = false;
+    	// TODO - check if connected to local wifi
+        return (wifi && local);
     }
     this.isConnected = function() {
         return (navigator.network.connection.type === Connection.CELL_2G || navigator.network.connection.type === Connection.CELL_3G || navigator.network.connection.type === Connection.CELL_4G || navigator.network.connection.type === Connection.WIFI || navigator.network.connection.type === Connection.ETHERNET);
@@ -192,7 +198,7 @@ ContactBook = function() {
             return false;
         }
         self.showLoader();
-        
+
         // if phone number is empty or invalid, add contact without searching in db
         if (person.phone.length < 9) {
             self.updateContact(null, person);
@@ -222,14 +228,14 @@ ContactBook = function() {
 
     this.addContact = function(person) {
 
-        console.log("p: "+person+", person.firstname: "+person.firstname+", person.phone: "+person.phone);
-        
+        console.log("p: " + person + ", person.firstname: " + person.firstname + ", person.phone: " + person.phone);
+
         self.searchForContact(person);
     }
     this.addSingleContact = function(evt) {
-        
-        console.log("currentPerson: person.firstname: "+currentPerson.firstname+", person.phone: "+currentPerson.phone);
-        
+
+        console.log("currentPerson: person.firstname: " + currentPerson.firstname + ", person.phone: " + currentPerson.phone);
+
         self.searchForContact(currentPerson);
     }
 
@@ -240,7 +246,7 @@ ContactBook = function() {
             contact,
             contactName;
 
-        contact = navigator.contacts.create();   
+        contact = navigator.contacts.create();
 
         if (foundContact !== null) {
             contact.id = foundContact.id;
@@ -249,15 +255,15 @@ ContactBook = function() {
             contact.phoneNumbers = [];
             contact.phoneNumbers.push(new ContactField('mobile', person.phone, true));
         }
-        
+
         // check duplicates in emails
         if (foundContact === null || !self.emailExists(foundContact, person.email)) {
-        	console.log("adding email");
-        	contact.emails = [];
+            console.log("adding email");
+            contact.emails = [];
             contact.emails.push(new ContactField('work', person.email, false));
-            console.log(contact.emails.length+", person email: "+person.email)
+            console.log(contact.emails.length + ", person email: " + person.email)
         }
-        
+
         contact.displayName = person.firstname + ' ' + person.lastname;
         contactName = new ContactName();
         contactName.givenName = person.firstname;
@@ -267,7 +273,7 @@ ContactBook = function() {
         contactOrganizations[0].name = "Schibsted Tech Polska";
         contact.organizations = contactOrganizations;
         contact.note = person.team;
-        
+
 
         // save
         contact.save(self.onSaveSuccess, function(e) {
@@ -276,21 +282,21 @@ ContactBook = function() {
 
     }
     this.emailExists = function(contact, email) {
-    	var i = 0,
-    		emailsArr = !!contact ?  contact.emails : null;
-    	
-    	if (!emailsArr) {
-    		return false;
-    	}
-    	
-    	for(i; i < emailsArr.length; i++) {
-        	console.log("email["+i+"]: "+emailsArr[i].value);
-        	if (emailsArr[i].value == email) {
-        		return true;
-        	}
+        var i = 0,
+            emailsArr = !! contact ? contact.emails : null;
+
+        if (!emailsArr) {
+            return false;
         }
-    	return false;
-    } 
+
+        for (i; i < emailsArr.length; i++) {
+            console.log("email[" + i + "]: " + emailsArr[i].value);
+            if (emailsArr[i].value == email) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     this.onSaveSuccess = function() {
         if (!saveAll.flague) {
@@ -305,7 +311,7 @@ ContactBook = function() {
     this.onSaveError = function(e, person) {
         if (!saveAll.flague) {
             self.hideLoader();
-            console.log("error code: "+e.code);
+            console.log("error code: " + e.code);
             self.displayMessage('Error', 'Something went wrong. Please try again.');
         } else {
             saveAll.fail++;
